@@ -1,39 +1,35 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
+import LembreteInput from './components/LembreteInput';
+import LembreteItem from './components/LembreteItem';
 
 export default function App() {
-  const [lembrete, setLembrete] = useState('');
   const [lembretes, setLembretes] = useState([]);
   const [contadorLembretes, setContador] = useState(0);
+  let teste = [];
 
-  // Função de captura do lembrete na digitação
-  const capturarLembrete = (lembreteDigitado) => {
-    setLembrete(lembreteDigitado);
+  const adicionarLembrete = (lembrete) => {
+    if(lembrete != '')
+    {
+      setLembretes(lembretes => {
+        setContador(contadorLembretes + 1);
+        return [...lembretes, { key: contadorLembretes.toString(), value: lembrete}]
+      })
+    }
   }
 
-  const adicionarLembrete = () => {
-    setLembretes(lembretes => {
-      setContador(contadorLembretes + 1);
-      return [...lembretes, { key: contadorLembretes.toString(), value: lembrete}]
-    })
-  }
+  const removerLembrete = (keyASerRemovida) => {
+    setLembretes (lembretes => {
+      return lembretes.filter((lembrete) =>
+        lembrete.key !== keyASerRemovida
+      )
+    });
+  };
 
   return (
     <View style={styles.container}>
       { /* Entrada dos lembretes */}
-      <View style={styles.lembreteView}>
-        <TextInput
-          placeholder="O que deseja lembrar?"
-          style={styles.lembreteInput}
-          onChangeText={capturarLembrete}
-          value={lembrete}
-        />
-
-        <Button
-          title="+ inserir lembrete"
-          onPress={adicionarLembrete}
-        />
-      </View>
+      <LembreteInput onAdicionarLembrete={adicionarLembrete} />
 
       { /* Lista dos lembretes */}
       {/* ScrollView gera a barra de rolagem na tela, porém tem funcionamento
@@ -60,11 +56,12 @@ export default function App() {
         <FlatList
           data={lembretes}
           renderItem={
-            lembrete => (
-              <View style={styles.itemNaLista}>
-                <Text>{lembrete.item.key} - {lembrete.item.value}</Text>
-              </View>
-            )
+            lembrete =>
+            <LembreteItem
+              chave={ lembrete.item.key }
+              lembrete={ lembrete.item.value }
+              onDelete={ removerLembrete }
+            />
           }
         />
       </View>
@@ -75,25 +72,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     padding: 50
-  },
-  lembreteView: {
-    marginBottom: 16
-  },
-  lembreteInput: {
-    textAlign: 'center',
-    borderColor: '#f2f2f2',
-    borderWidth: 2,
-    borderRadius: 3,
-    marginBottom: 15,
-    padding: 15,
-  },
-  itemNaLista: {
-    padding: 15,
-    backgroundColor: '#F0F0',
-    borderColor: 'black',
-    borderWidth: 1,
-    marginBottom: 8,
-    borderRadius: 3,
-    alignItems: 'center'
   }
 })
